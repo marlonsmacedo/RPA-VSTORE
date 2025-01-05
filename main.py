@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
+# TODO: Implementar depois...
 def importa_preços(Filename: str) -> List:
     if Filename.endswith(".xlsx"):
         print("ENTROU NO IF")
@@ -19,9 +19,9 @@ def importa_preços(Filename: str) -> List:
         lista_de_preços = df.values.tolist()
         return lista_de_preços
 
-
+# Determina Quais lojas vão receber a altreção do produto da lista/excel etc...
 def determina_lojas() -> str:
-    return "1,2,3"
+    return "1,2,3" #Lista o nº das filiais atraves do seu numero de cadastro no Visual Store.
 
 
 def process(
@@ -33,8 +33,8 @@ def process(
     driver.get(url)
 
     # TODO ALterar campos hardcoded de senha e usuario para variaveis de ambiente
-    driver.find_element(By.ID, "usuarios").send_keys("45948")
-    driver.find_element(By.ID, "senha").send_keys("123456")
+    driver.find_element(By.ID, "usuarios").send_keys("USER_LOGIN")
+    driver.find_element(By.ID, "senha").send_keys("USER_PASS")
     driver.find_element(By.ID, "btnEnviar").submit()
 
     try:
@@ -71,19 +71,18 @@ def process(
         # Mudando pro Iframe carregado do menu Cadastro > Preço Imediato > Varejo e Promoção
     driver.switch_to.frame("desktop")
 
-    # Acessando input Produto ID e Enviando tecla TAB para carrecar o produto e a embalagem
-    # TODO: Implementar o slançamentos de valores a partir de um excel de forma ASSINCRONA (V2)
-    # TODO: Implementar o slançamentos de valores a partir de um excel de forma SINCRONA (V1)
-
+    
+    # TODO: Implementar os lançamentos de valores a partir de um excel de forma ASSINCRONA (V2)?
+    # TODO: Implementar parseamento das entradas de informações (txt, xls e etc..)_
     arquivo = "alteracoes.xlsx"
     local_dir = os.getcwd()
     filepath = os.path.join(local_dir, arquivo)
     dados = pd.read_excel(filepath)
+    
     try:
         for _, row in dados.iterrows():
-
-
-            print(f'ITEM -->{ str(row["CODIGO"])[:-4].strip()}  PRECO --> {str(row["PRECO"]).strip()}')
+            # Acessando input Produto ID e Enviando tecla ENTER para carrecar o produto e a embalagem
+            print(f'ITEM -->{ str(row["CODIGO"])[:-4].strip()}  PRECO --> {str(row["PRECO"]).strip()}') 
             produto_id = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.NAME, "txtProdutoId"))
             )
@@ -109,7 +108,6 @@ def process(
 
             list_lojas = list(map(int, list_lojas.split(",")))
             
-
             for index in range(len(list_lojas)):
                 try:
                     tr = WebDriverWait(driver, 2).until(
@@ -137,13 +135,9 @@ def process(
             
             
     except Exception as e :
-        
         print(f'ITEM: {row["CODIGO"]} --> Exception: {e}')
         
-
 if __name__ == "__main__":
-
-    url = "http://10.0.91.98:8091/vm_visualstore_adm/"
-    # print(importa_preços('alteracoes.xlsx'))
+    url = f"http://{VSTORE_URL}:{VSTORE_PORT}/vm_visualstore_adm/"
     browser = selenium_chrome_driver()
     process(None, url, browser)
