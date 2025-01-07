@@ -14,7 +14,6 @@ from selenium.webdriver.support import expected_conditions as EC
 # TODO: Implementar depois...
 def importa_preços(Filename: str) -> List:
     if Filename.endswith(".xlsx"):
-        print("ENTROU NO IF")
         df = pd.read_excel(Filename)
         lista_de_preços = df.values.tolist()
         return lista_de_preços
