@@ -1,4 +1,3 @@
-from drivers.chrome import selenium_chrome_driver
 import os
 import time
 import pandas as pd
@@ -9,7 +8,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from drivers.chrome import selenium_chrome_driver
+import dotenv
 
 # TODO: Implementar depois...
 def importa_preços(Filename: str) -> List:
@@ -32,8 +32,8 @@ def process(
     driver.get(url)
 
     # TODO ALterar campos hardcoded de senha e usuario para variaveis de ambiente
-    driver.find_element(By.ID, "usuarios").send_keys("USER_LOGIN")
-    driver.find_element(By.ID, "senha").send_keys("USER_PASS")
+    driver.find_element(By.ID, "usuarios").send_keys(VSTORE_USER)
+    driver.find_element(By.ID, "senha").send_keys(VSTORE_PASS)
     driver.find_element(By.ID, "btnEnviar").submit()
 
     try:
@@ -55,16 +55,16 @@ def process(
         )
         preco_imediato_hover.perform()
 
-        # Opções > Cadastro > Preço Imediato > Varejo e Promoção
-        preco_imediato_menu_hover = WebDriverWait(driver, 10).until(
+        # Opções > Cadastro > Preço Imediato > Clube
+        preco_clube_menu_hover = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located(
-                (By.XPATH, "/html[1]/body[1]/a[34]/div[1]")
+                (By.XPATH, "/html[1]/body[1]/a[36]/div[1]")
             )
         )
-        preco_imediato_hover = (
-            ActionChains(driver).move_to_element(preco_imediato_menu_hover).click()
+        preco_clube_hover = (
+            ActionChains(driver).move_to_element(preco_clube_menu_hover).click()
         )
-        preco_imediato_hover.perform()
+        preco_clube_hover.perform()
     except Exception as e:
         print(e)
         # Mudando pro Iframe carregado do menu Cadastro > Preço Imediato > Varejo e Promoção
@@ -137,6 +137,16 @@ def process(
         print(f'ITEM: {row["CODIGO"]} --> Exception: {e}')
         
 if __name__ == "__main__":
-    url = f"http://{VSTORE_URL}:{VSTORE_PORT}/vm_visualstore_adm/"
+
+    # Carregando dados do Ambiente:
+    dotenv.load_dotenv()
+
+    VSTORE_URL = os.getenv('VSTORE_URL')
+    VSTORE_ADM = os.getenv('VSTORE_ADM')
+    VSTORE_PORT = os.getenv('VSTORE_PORT')
+    VSTORE_USER = os.getenv('VSTORE_USER')
+    VSTORE_PASS = os.getenv('VSTORE_PASS')
+
+    url = f"{VSTORE_URL}:{VSTORE_PORT}/{VSTORE_ADM}"
     browser = selenium_chrome_driver()
     process(None, url, browser)
