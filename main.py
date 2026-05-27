@@ -1,4 +1,4 @@
-from drivers.chrome import selenium_chrome_driver
+from drivers.driver import selenium_chrome_driver
 import os
 import time
 import pandas as pd
