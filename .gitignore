@@ -1,4 +1,10 @@
 .venv
+.env
+.env.*
+!.env.example
+data.json
+automacoes/dados.json
+automacoes/offline_componentes.html
 *.xlsx
 __pycache__
 uv.lock
